@@ -1,7 +1,7 @@
 # Response Workflow — Security Hub to EventBridge to Lambda
 
 ## Purpose
-This workflow performs an automated first-response action on GuardDuty findings after they are normalized in Security Hub.
+This workflow updates GuardDuty findings in Security Hub for triage. It sets status and adds a note; it does not contain or remediate the affected resource.
 
 ## Trigger
 - Security Hub imported findings event
@@ -27,14 +27,14 @@ Code artifact:
 ## Constraint, decision, and evidence
 Security Hub was enabled after the first sample-finding batch. Because of that timing, the response workflow was validated against a second batch generated after Security Hub was already importing findings.
 
-One finding was also updated manually by CLI so the final `NOTIFIED` state was easy to show in the Security Hub console. That manual step was used for proof presentation, not as a substitute for the Lambda workflow.
+One finding was also updated manually by CLI so the final `NOTIFIED` state was easy to show in the Security Hub console. The console screenshot alone cannot attribute the final state to Lambda.
 
 ## Validation evidence
 - `../../screenshots/06_response_executed.png`
 - Lambda CloudWatch logs showing successful `workflow_status = NOTIFIED`
 
 ## Why `NOTIFIED` was the right response here
-These are GuardDuty sample findings, not a real compromised workload. Updating the finding workflow and adding an automation note is an honest first-response action. It proves orchestration without pretending a sample finding justified host containment.
+The lab uses sample findings. `NOTIFIED` records a triage workflow state; it does not confirm containment or remediation.
 
 ## Operational note
-The original logs showed at least one `TooManyRequestsException` from the Security Hub API during burst processing. The successful updates still prove the workflow worked, but retry and backoff should be added before using this pattern in a busier environment.
+The original logs showed at least one `TooManyRequestsException` from the Security Hub API during burst processing. The handler now raises on API exceptions and rejected updates so the invocation fails and can use Lambda retry handling. It logs `NOTIFIED` only after an accepted update. Retry exhaustion and delivery guarantees have not been tested live.

@@ -1,10 +1,10 @@
 scenario,observable_type,observable_value,notes
-failed_signin_burst,ip_address,76.221.94.x,"Source IP associated with the failed sign-in burst and later correlated success; partially redacted for publish-safe sharing"
+failed_signin_burst,ip_address,<SOURCE_IP>,"Source IP associated with the failed sign-in burst and later correlated success; partially redacted for publish-safe sharing"
 failed_signin_burst,user_alias,lab06-user-a,"Lab user included in the failed sign-in burst validation"
 failed_signin_burst,user_alias,lab06-user-b,"Lab user included in the failed sign-in burst validation"
 failed_signin_burst,user_alias,lab06-user-c,"Lab user included in the failed sign-in burst validation"
 failed_signin_burst,pattern,multiple_failed_signins_same_ip,"Observed repeated failed sign-ins from one IP across multiple users in SigninLogs"
-success_after_failure,ip_address,76.221.94.x,"Same source IP later associated with a successful sign-in after the failure burst; partially redacted for publish-safe sharing"
+success_after_failure,ip_address,<SOURCE_IP>,"Same source IP later associated with a successful sign-in after the failure burst; partially redacted for publish-safe sharing"
 success_after_failure,pattern,success_after_recent_failure_burst,"Hunt-only correlation showing a later success from the same IP after clustered failures"
 directory_role_assignment,role_name,Security Reader,"Directory role used for role assignment change validation"
 directory_role_assignment,target_alias,lab06-role-target,"Target user alias used for role assignment validation"

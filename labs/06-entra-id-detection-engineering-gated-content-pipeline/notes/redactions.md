@@ -32,20 +32,11 @@ This file records what I reviewed before publishing Lab 06 and what I chose to r
 - scenario timestamps and sequence details needed to explain the validation flow
 - the GitHub org, repo name, and environment name because they are part of the public repo story
 
-## What stayed local or still needs a deliberate push decision
+## Current source exclusions
 
-- `notes/lab06-values.env` stays local and should not be tracked
-- `notes/federated-credential.local.json` is a local helper file and should not be tracked
-- `artifacts/` contains runtime workflow output and deployment result files; keep it out of the public push unless you intentionally want those raw runtime artifacts public
-- `dist/` contains generated package files; it is build output, not the source of truth
+- Local OIDC values, raw workflow outputs under `artifacts/`, and generated packages under `dist/` are excluded from source control.
+- Previously tracked runtime outputs were removed during review. Existing Git history is unchanged.
+- The identity workbook now uses `<SUBSCRIPTION_ID>` for subscription references. Replace it when adapting the workbook to your lab.
+- The identity observable list uses `<SOURCE_IP>` instead of the original source subnet.
 
-## Verification notes
-
-- I reviewed the exported analytics and automation content for secrets, credentials, and user-specific ownership fields.
-- I reviewed the workbook export more closely because workbook JSON can retain workspace-specific references as part of the export format.
-- The narrower deployable workbook wrapper used for the gated deployment proof is [pipeline/deploy/workbook.serialized.json](../pipeline/deploy/workbook.serialized.json).
-- The fuller workbook evidence export under [workbooks/exports/identity_dashboard.json](../workbooks/exports/identity_dashboard.json) still carries workspace-specific resource references. That is not a secret by itself, but it is extra environment detail and should be a deliberate publish decision.
-
-## Result
-
-The documentation layer is publish-safe after redaction. The remaining publish-safety judgment calls are the local-only helper files, the raw runtime files under `artifacts/`, and whether the full workbook export stays public in addition to the narrower deploy wrapper.
+These changes reduce environment details in the current source. They do not remove values from historical commits or earlier workflow logs.

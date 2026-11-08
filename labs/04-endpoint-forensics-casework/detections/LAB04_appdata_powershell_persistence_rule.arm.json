@@ -17,7 +17,7 @@
       "kind": "Scheduled",
       "properties": {
         "displayName": "LAB04 - PowerShell persistence-style script execution from AppData",
-        "description": "Detects PowerShell process creation executing a script from user AppData with bypass flags",
+        "description": "Matches Sysmon process creation events containing the lab AdobeUpdate script path. This canary-specific rule does not independently establish PowerShell execution, bypass flags or scheduled-task persistence.",
         "severity": "High",
         "enabled": true,
         "query": "Event\n| where TimeGenerated > ago(1h)\n| where EventLog == \"Microsoft-Windows-Sysmon/Operational\"\n| where EventID == 1\n| extend Msg = coalesce(\n    tostring(column_ifexists(\"RenderedDescription\",\"\")),\n    tostring(column_ifexists(\"ParameterXml\",\"\")),\n    tostring(column_ifexists(\"EventData\",\"\"))\n  )\n| where Msg has @\"\\AdobeUpdate\\adobeupdate.ps1\"\n| extend CommandLine = extract(@\"CommandLine:\\s*(.*)\", 1, Msg)\n| project TimeGenerated, Computer, EventLog, EventID, CommandLine\n| order by TimeGenerated desc",

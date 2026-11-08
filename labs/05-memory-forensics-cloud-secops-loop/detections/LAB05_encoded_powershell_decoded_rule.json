@@ -14,8 +14,8 @@
             "kind": "Scheduled",
             "apiVersion": "2023-12-01-preview",
             "properties": {
-                "displayName": "LAB05 - Encoded PowerShell (decoded payload present)",
-                "description": "Detects Sysmon EID 1 PowerShell with EncodedCommand and decodes payload from RenderedDescription.",
+                "displayName": "LAB05 - Encoded PowerShell candidate",
+                "description": "Finds Sysmon EID 1 events with an EncodedCommand blob on the lab host and attempts ASCII canary decoding from command-line telemetry. A match does not require successful decoding or prove malicious execution.",
                 "severity": "High",
                 "enabled": true,
                 "query": "Event\r\n| where TimeGenerated > ago(1h)\r\n| where Computer has \"win-ws1\"\r\n| where EventLog == \"Microsoft-Windows-Sysmon/Operational\"\r\n| where EventID == 1\r\n| where RenderedDescription has \"EncodedCommand\"\r\n| extend EncodedBlob = extract(@\"(?i)(?:-enc(?:odedcommand)?\\s+)([A-Za-z0-9+/=]+)\", 1, RenderedDescription)\r\n| where isnotempty(EncodedBlob)\r\n| extend DecodedRaw = base64_decode_tostring(EncodedBlob)\r\n| extend Decoded = replace_regex(DecodedRaw, @\"\\x00\", \"\")\r\n| project TimeGenerated, Computer, EncodedBlob, Decoded, RenderedDescription\r\n| sort by TimeGenerated desc",

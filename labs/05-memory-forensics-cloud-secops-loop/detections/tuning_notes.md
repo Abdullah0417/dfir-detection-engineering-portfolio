@@ -4,7 +4,8 @@ Rule: **LAB05 - Encoded PowerShell (decoded payload present)** (`detections/LAB0
 
 ## What it detects
 - Sysmon **EID 1** ProcessCreate where `RenderedDescription` contains `-EncodedCommand`
-- Extracts the base64 blob and decodes it (UTF-16LE), then projects the decoded content
+- Extracts the Base64 blob, decodes it as UTF-8, and removes NUL characters. This works for the lab's ASCII canary stored as UTF-16LE; it is not a general UTF-16 decoder. Non-ASCII payloads may be missing or decoded incorrectly.
+- Decoding comes from logged command-line data. Process-memory strings are separate evidence.
 
 ## Tuning ideas (if you deploy this outside a lab)
 - **Reduce noise:**

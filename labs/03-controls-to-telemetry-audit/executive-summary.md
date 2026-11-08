@@ -21,7 +21,7 @@ Assess whether critical endpoint controls are **observable** via telemetry in Mi
 - **Workbook dashboard:** stakeholder KPIs + technical drill-down
 
 ## Risk impact (why this matters)
-When controls aren’t observable **across the fleet**, incidents become “unprovable”: you can’t reliably detect, investigate, or defend decisions.
+Missing telemetry limits investigation. An absent event can reflect missing test activity, a collection gap, or the chosen time window; those causes need separate checks.
 
 ## Recommendations (prioritized)
 1) **High:** Validate required signals on **every endpoint** (run the canary harness per host) and track gaps using the matrix.

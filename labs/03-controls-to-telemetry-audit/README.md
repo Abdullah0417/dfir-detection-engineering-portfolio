@@ -13,15 +13,15 @@
 
 ![LAB03 — Telemetry Coverage Dashboard](screenshots/16_workbook_overview.png)
 
-## What this proves
-- Telemetry coverage can be assessed as a **repeatable audit** (not “trust me” screenshots)
-- I can build a **coverage validation harness** (known-good test events + pass/fail KQL)
-- I can translate telemetry into a **stakeholder-readable coverage score + top gaps**
-- I can ship improvements as **rules-as-code** (analytic rule + automation rule + workbook export)
-- I can map detection logic to **MITRE ATT&CK** and explain what coverage means
+## What I tested
+- Generated known test events and checked which appeared in Sentinel.
+- Compared results across two Windows endpoints using a coverage matrix and workbook.
+- Created an audit/log-tampering rule with incident tagging and ATT&CK mappings.
+
+The score counts observed event types in the selected window. It does not measure overall security effectiveness.
 
 ## Scenario & scope
-Engagement type: Visibility / Telemetry Coverage Assessment  
+Exercise: Windows telemetry coverage check
 Environment: Azure lab (2 Windows endpoints) → Microsoft Sentinel (Log Analytics)  
 Primary question: **“If something bad happens, will we see it — and can we prove it?”**
 
@@ -69,7 +69,7 @@ Implementation detail: in this workspace, `Event.EventData` is XML (string). Que
 ---
 
 ## Import / deploy (Portal)
-This lab ships deployable exports.
+This lab includes templates to adapt to your workspace.
 
 **Prereqs**
 - Microsoft Sentinel enabled on the workspace
@@ -105,7 +105,7 @@ This lab ships deployable exports.
 - Follow: [`notes/control_test_harness.md`](notes/control_test_harness.md)
 - Script option (run on `win-ws1`): [`notes/control_test_harness_winws1.ps1`](notes/control_test_harness_winws1.ps1)
 
-**Important:** if you want **fleet coverage** (not single-host coverage), run the harness (or equivalent actions) on **each endpoint**.
+The harness previews changes by default. Use `-Commit -WhatIf` to inspect the plan and `-Commit` to apply it on an elevated, disposable lab VM. It prompts for a password, creates a disabled canary account with local Administrators membership, creates a task, and changes audit policy. Restore the VM snapshot after testing. Run equivalent tests on each host before comparing coverage.
 
 ### 2) Run validation KQL (pass/fail)
 Run the queries in order:
@@ -127,7 +127,7 @@ Update:
 
 ## Evidence (screenshots)
 - Repo structure: [`screenshots/00_repo_structure.png`](screenshots/00_repo_structure.png)
-- Control test harness output: [`screenshots/01_control_test_harness_output.png`](screenshots/01_control_test_harness_output.png)
+- [Control test harness output](screenshots/01_control_test_harness_output.png) — Historical lab execution screenshot. The password has been redacted; the remaining output is unchanged. The current script prompts for a unique password and previews changes by default.
 - Heartbeat validation: [`screenshots/02_validation_heartbeat.png`](screenshots/02_validation_heartbeat.png)
 - Sysmon validation: [`screenshots/03_validation_sysmon_eid1.png`](screenshots/03_validation_sysmon_eid1.png) · [`screenshots/04_validation_sysmon_eid3.png`](screenshots/04_validation_sysmon_eid3.png)
 - Security validation: [`screenshots/05_validation_4624.png`](screenshots/05_validation_4624.png) · [`screenshots/06_validation_4625.png`](screenshots/06_validation_4625.png) · [`screenshots/07_validation_4732.png`](screenshots/07_validation_4732.png) · [`screenshots/08_validation_4698.png`](screenshots/08_validation_4698.png) · [`screenshots/09_validation_4719.png`](screenshots/09_validation_4719.png)

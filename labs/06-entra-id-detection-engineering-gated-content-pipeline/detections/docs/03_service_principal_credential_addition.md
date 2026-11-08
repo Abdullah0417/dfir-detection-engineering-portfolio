@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Detect the addition of a new password credential to a dedicated service principal.
+Find service principal audit events that may indicate a credential change.
 
 ## Telemetry
 
@@ -18,7 +18,7 @@ Detect the addition of a new password credential to a dedicated service principa
 
 ## Logic
 
-The rule looks back one hour for the exact credential-addition operation names observed during discovery. It expands `TargetResources` so the alert includes the target application or service principal.
+The rule looks back one hour for `Add service principal credentials` and `Update service principal`. It expands `TargetResources` so the alert includes the target application or service principal. `Update service principal` also covers unrelated changes; inspect modified properties and the result before concluding that a credential was added.
 
 ## Thresholds
 
@@ -53,7 +53,7 @@ The rule looks back one hour for the exact credential-addition operation names o
 
 ## Limitations
 
-This rule is intentionally focused on a dedicated lab service principal so the detection logic can be validated cleanly without polluting the OIDC deployment identity.
+The scenario used a dedicated lab service principal, but the query has no target-ID filter and searches all matching events in the workspace. It includes failed operations and does not distinguish credential addition from removal or other updates. Treat results as triage candidates. The OIDC deployment identity was separate from the scenario identity.
 
 ## Evidence
 

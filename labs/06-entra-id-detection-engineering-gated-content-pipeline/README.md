@@ -2,7 +2,7 @@
 
 [![Lab 06 workbook hero](screenshots/13_workbook_identity_dashboard.png)](screenshots/13_workbook_identity_dashboard.png)
 
-## What this lab proves
+## What I tested
 
 - I validated Microsoft Entra ID telemetry in Microsoft Sentinel before I wrote detections.
 - I built and tested identity-focused KQL against real Entra activity, including failed sign-in bursts, directory role changes, and service principal credential changes.
@@ -10,11 +10,11 @@
 - I added a lightweight response layer with an automation rule and a focused workbook so the lab shows an analyst workflow instead of isolated query output.
 - I exported the content as code and then proved the gated path into a separate test workspace with GitHub OIDC, validation checks, packaging, ARM `what-if`, approval, and a controlled test deployment.
 
-This lab closes the identity-focused detection engineering gap in the portfolio and adds a narrow but real gated deployment story without pretending to be a full enterprise release platform.
+The deployment workflow creates a workbook in the test workspace. Analytics and automation rules are included as separate exports.
 
 ## Scenario and scope
 
-This is an identity detection engineering lab built in Microsoft Sentinel. It is not a report-only write-up and it is not claiming a finished multi-environment release program.
+This lab uses controlled identity activity in Microsoft Sentinel.
 
 The goal was to show that I can take Entra telemetry from connector validation through hunt development, scheduled analytics, incident handling, workbook presentation, export the content as code, and then move that content through a gated test deployment path.
 
@@ -64,9 +64,7 @@ I kept the workflow simple and deliberate:
 
 ## Pipeline and gated deployment
 
-I did not stop at exports.
-
-I also proved the GitHub-to-Azure trust path and the gated deployment flow used for this lab. The public proof covers:
+The deployment evidence covers:
 
 - federated credential setup for the GitHub environment
 - protected environment approval
@@ -75,7 +73,9 @@ I also proved the GitHub-to-Azure trust path and the gated deployment flow used 
 - ARM `what-if` review before deployment
 - deployment of the lightweight workbook wrapper into the Lab 06 test workspace
 
-That claim stays narrow on purpose. In this version, the repo stores the analytics and automation as exported artifacts, while the deploy proof centers on the deployable workbook wrapper and the gating path around it.
+The current what-if check permits `Create`, `Modify`, and `NoChange`. It stops on deletion, incomplete or unknown change types, failed operations, and malformed results.
+
+The Bicep deployment creates the workbook only. The analytics and automation exports need separate import and validation.
 
 **Artifacts**
 - [pipeline/manifests/content-manifest.json](pipeline/manifests/content-manifest.json)
@@ -111,7 +111,7 @@ Related proof:
 
 ### A later success from the same IP added useful investigation context
 
-I kept the success-after-failure logic as hunt material instead of making it the flagship scheduled rule. It is useful during triage, but the failed-burst analytic was the cleaner operational detection.
+The success-after-failure query is a hunt for investigation. The failed-burst query is the scheduled analytic.
 
 Related proof:
 - [Successful sign-in after failure burst hunt](screenshots/05_success_after_failure_burst_hunt.png)
@@ -125,15 +125,15 @@ Related proof:
 - [Directory role assignment analytic](screenshots/09_rule_role_assignment_change.png)
 - [Identity incident triggered](screenshots/11_identity_incident_triggered.png)
 
-### Service principal credential changes added cloud identity depth
+### Service principal update candidates
 
-The service principal scenario produced the paired audit events I expected for credential changes. That gave the lab a stronger cloud identity angle than a sign-in-only build.
+The service principal scenario produced audit events that I used to investigate credential changes.
 
 Related proof:
 - [Service principal credential addition hunt](screenshots/07_sp_credential_addition_hunt.png)
 - [Service principal credential addition analytic](screenshots/10_rule_sp_credential_addition.png)
 
-## Detections shipped
+## Detections
 
 ### Failed sign-in burst by IP
 
@@ -141,7 +141,7 @@ Related proof:
 Detect repeated failed Microsoft Entra interactive sign-ins from a single IP across multiple users within a short time window.
 
 **Why it matters**  
-It is a strong identity detection for password-spraying or brute-force style activity, and it is easy to explain during triage.
+A burst across multiple users can indicate password spraying. Shared IP addresses and normal sign-in failures also need investigation.
 
 **Artifacts**
 - [kql/analytics/failed_signin_burst_by_ip.kql](kql/analytics/failed_signin_burst_by_ip.kql)
@@ -167,7 +167,7 @@ It is a clean `AuditLogs` signal with obvious security impact and very little am
 **Proof**
 - [Directory role assignment analytic](screenshots/09_rule_role_assignment_change.png)
 
-### Service principal credential addition
+### Service principal credential-change candidates
 
 **Purpose**  
 Detect the addition of a new password credential to a Microsoft Entra service principal.
@@ -183,7 +183,7 @@ It adds cloud identity depth and shows awareness of persistence through app and 
 **Proof**
 - [Service principal credential addition analytic](screenshots/10_rule_sp_credential_addition.png)
 
-## Automation shipped
+## Incident automation
 
 I kept the response layer intentionally light.
 
@@ -195,7 +195,7 @@ The automation rule triggers when a Lab 06 incident is created and applies a sta
 **Proof**
 - [Identity triage automation rule](screenshots/12_automation_rule_identity_triage.png)
 
-## Workbook shipped
+## Workbook
 
 The workbook is intentionally compact. The point was to give an analyst one place to review the most relevant identity signals, not to build a giant dashboard for its own sake.
 
@@ -218,7 +218,7 @@ It includes:
 
 ## MITRE mapping
 
-I mapped the detections to identity-relevant ATT&CK techniques and avoided forcing coverage that the lab did not actually demonstrate.
+The mappings describe the simulated behaviors and detection scope.
 
 Current mappings include:
 
@@ -246,13 +246,15 @@ Tracked observables include:
 
 ## Notes and constraints
 
+The service principal query includes broad `Update service principal` events. It can return unrelated or failed updates and is not restricted to the dedicated lab service principal. Review the result and modified properties before classifying a credential addition.
+
 A few boundaries matter here:
 
 - `AuditLogs` were the hard requirement. If `SigninLogs` had not been available, the lab would have shifted to an audit-heavy fallback instead of pretending sign-in visibility existed.
 - The success-after-failure logic was useful hunt material, but I kept the primary scheduled detections focused on the cleaner signals.
-- The automation rule is intentionally simple. I did not turn this into a Logic App orchestration or ticketing integration project.
-- The workbook is intentionally small. Analyst usefulness mattered more than dashboard sprawl.
-- The pipeline claim is intentionally narrow. I proved OIDC, validation, packaging, `what-if`, approval, and controlled test deployment. I am not claiming a mature multi-environment release program.
+- The automation rule tags incidents and sets severity.
+- The workbook displays ingestion, sign-in, role-change, and credential-event views.
+- OIDC deployment targets a separate test workspace and creates only the workbook.
 
 ## What I would improve next
 

@@ -1,25 +1,44 @@
-# Lab 03 — benign control test harness
-# Creates known events so Sentinel KQL can validate coverage.
+# Run only in a disposable Windows lab; restore its snapshot after checking telemetry.
+[CmdletBinding(SupportsShouldProcess)]
+param([switch]$Commit)
 
-$User = "lab03_user"
-$Pass = "P@ssw0rd-ForLab03!"   # lab-only; do not reuse anywhere
-$TaskPath = "\Lab03\"
-$TaskName = "CanaryTask"
-$FullTask = $TaskPath + $TaskName
+$ErrorActionPreference = 'Stop'
+$User = 'lab03_user'
+$TaskPath = '\Lab03\'
+$TaskName = 'CanaryTask'
 
-Write-Host "== A) Generate a failed logon (4625) =="
-cmd /c "net use \\localhost\ipc$ /user:$User WrongPassword123" | Out-Null
+if (-not $Commit) {
+    Write-Output 'Preview: attempt a failed local logon, create a disabled test user, add it to Administrators, create a SYSTEM canary task, and enable Security Group Management auditing. Use -Commit to apply, or -Commit -WhatIf to preview.'
+    return
+}
+if (-not $PSCmdlet.ShouldProcess($env:COMPUTERNAME, 'Generate Lab03 audit events and change local accounts, task and audit policy')) {
+    return
+}
 
-Write-Host "== B) Create local user (4720) =="
-cmd /c "net user $User $Pass /add" | Out-Null
+# Check conflicts before making changes; never replace an existing user or task.
+if (Get-LocalUser | Where-Object Name -eq $User) {
+    throw "Local user $User already exists. Use a fresh lab snapshot."
+}
+if (Get-ScheduledTask | Where-Object { $_.TaskPath -eq $TaskPath -and $_.TaskName -eq $TaskName }) {
+    throw 'The Lab03 canary task already exists. Use a fresh lab snapshot.'
+}
+$Password = Read-Host 'Choose a unique password for the disabled lab account' -AsSecureString
 
-Write-Host "== C) Add user to local Administrators (4732) =="
-cmd /c "net localgroup Administrators $User /add" | Out-Null
+try {
+    # Failure is intentional here. Event delivery depends on audit policy and collection.
+    & cmd.exe /c 'net use \\localhost\ipc$ /user:lab03_user IntentionallyWrongLabPassword >nul 2>&1'
 
-Write-Host "== D) Create scheduled task (4698) =="
-cmd /c "schtasks /Create /TN `"$FullTask`" /SC ONCE /ST 23:59 /TR `"cmd.exe /c whoami > C:\Windows\Temp\lab03_canary.txt`" /RU SYSTEM /F" | Out-Null
+    New-LocalUser -Name $User -Password $Password -Disabled | Out-Null
+    Add-LocalGroupMember -SID 'S-1-5-32-544' -Member $User
 
-Write-Host "== E) Change audit policy (4719) =="
-cmd /c "auditpol /set /subcategory:`"Security Group Management`" /success:enable /failure:enable" | Out-Null
+    & schtasks.exe /Create /TN "$TaskPath$TaskName" /SC ONCE /ST 23:59 /TR 'cmd.exe /c whoami > C:\Windows\Temp\lab03_canary.txt' /RU SYSTEM
+    if ($LASTEXITCODE -ne 0) { throw "Scheduled task creation failed (exit $LASTEXITCODE)." }
 
-Write-Host "Done. Next: run Sentinel validation KQL pack."
+    & auditpol.exe /set '/subcategory:Security Group Management' /success:enable /failure:enable
+    if ($LASTEXITCODE -ne 0) { throw "Audit policy update failed (exit $LASTEXITCODE)." }
+
+    Write-Output 'Lab actions completed. Check Sentinel for the expected events, then restore the disposable VM snapshot.'
+}
+catch {
+    throw "Lab harness stopped. Earlier changes may remain; inspect the VM or restore its snapshot. $($_.Exception.Message)"
+}

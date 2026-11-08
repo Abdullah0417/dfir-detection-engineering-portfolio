@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Azure login with OIDC
         uses: azure/login@v2
@@ -31,12 +33,12 @@ jobs:
       - name: Show active account
         shell: bash
         run: |
-          az account show -o jsonc
+          az account show --query '{state:state}' -o jsonc
 
       - name: Show test resource group
         shell: bash
         run: |
-          az group show --name "${AZURE_RG_TEST}" -o jsonc
+          az group show --name "${AZURE_RG_TEST}" --query '{location:location,state:properties.provisioningState}' -o jsonc
 
       - name: Show test workspace
         shell: bash
@@ -44,7 +46,7 @@ jobs:
           az monitor log-analytics workspace show \
             --resource-group "${AZURE_RG_TEST}" \
             --workspace-name "${SENTINEL_WORKSPACE_NAME_TEST}" \
-            -o jsonc
+            --query '{location:location,state:provisioningState}' -o jsonc
 
       - name: Save smoke-test inventory
         shell: bash

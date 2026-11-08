@@ -1,58 +1,52 @@
-# DFIR / Detection Engineering Portfolio
+# DFIR and Detection Engineering Labs
 
-DFIR and detection engineering portfolio with seven completed labs across Microsoft Sentinel, Microsoft Entra ID, Windows forensics, and AWS cloud security. The labs turn telemetry into investigations, detections, automation, and publish-safe deployment artifacts, including a gated Sentinel content deployment pipeline.
+Seven security labs covering Windows telemetry, incident timelines, endpoint artifacts, Microsoft Entra ID detections, and AWS GuardDuty findings. Each lab includes queries or code, screenshots from the lab, and notes on the results and limitations.
 
-## Portfolio snapshot
-- 7 completed labs
-- 2 planned labs
-- Publish-safe: screenshots, queries, exports, templates, manifests, and sanitized IOC material only; no raw evidence
-- Reusable outputs: KQL, analytics exports, automation, workbooks, timelines, IOC packs, Terraform, Athena SQL, Lambda code, and evidence manifests
+## Start here
 
-## What this portfolio shows
-- Detection engineering, investigation, and response workflows across endpoint, identity, SIEM, and cloud
-- Reusable security artifacts: KQL, exported analytics, automation rules, workbooks, Terraform, SQL, Lambda code, timelines, and evidence manifests
+- [04 — Endpoint forensics](labs/04-endpoint-forensics-casework/): follow a benign scheduled-task scenario through MFT and event-log analysis into Sentinel detections.
+- [06 — Entra ID detections](labs/06-entra-id-detection-engineering-gated-content-pipeline/): review three identity detections and a GitHub Actions workflow that deploys a workbook to a test workspace.
+- [07 — GuardDuty findings](labs/07-aws-guardduty-detection-response/): trace sample findings through S3, Athena, email notification, and a Security Hub workflow-status update.
 
-## Recommended starting points
-- [06 — Entra ID Detection Engineering + Gated Content Pipeline](labs/06-entra-id-detection-engineering-gated-content-pipeline/)  
-  Validate Entra telemetry, build identity detections and triage content, then validate, package, and deploy Sentinel content to a separate test workspace through a gated GitHub OIDC pipeline.
+## Labs
 
-- [07 — AWS GuardDuty Detection + Response](labs/07-aws-guardduty-detection-response/)  
-  Build AWS-native alerting, finding retention, Athena triage, and a Security Hub-driven response workflow.
+| Lab | Work covered | Main limitation |
+| --- | --- | --- |
+| [01 — Telemetry and SIEM validation](labs/01-telemetry-siem-validation/) | Check AMA/DCR collection of Heartbeat, Sysmon, and Windows Security events | Results describe the configured lab hosts and capture window |
+| [02 — Incident reconstruction](labs/02-incident-reconstruction/) | Build a timeline across two Windows hosts and detect encoded PowerShell | Benign test activity; encoded commands alone do not establish malicious intent |
+| [03 — Telemetry coverage](labs/03-controls-to-telemetry-audit/) | Generate test events and compare observed coverage across hosts | Missing events can mean missing test activity; they do not automatically prove a collection failure |
+| [04 — Endpoint forensics](labs/04-endpoint-forensics-casework/) | Correlate MFT and EVTX artifacts from a scheduled-task scenario | Controlled simulation; raw evidence remains local |
+| [05 — Process-memory investigation](labs/05-memory-forensics-cloud-secops-loop/) | Recover canary strings from a process dump and correlate Sentinel events | Full-RAM Volatility analysis did not succeed; command-line decoding and memory strings are separate evidence sources |
+| [06 — Entra ID detections and workbook deployment](labs/06-entra-id-detection-engineering-gated-content-pipeline/) | Build identity detections, incident tagging, a workbook, and an OIDC deployment workflow | The deployment wrapper creates the workbook; analytics and automation are separate exports |
+| [07 — GuardDuty detection and triage](labs/07-aws-guardduty-detection-response/) | Query sample findings, send SNS alerts, and update Security Hub findings with Lambda | Sample findings; the response updates workflow status and does not contain an attack |
 
-- [04 — Endpoint Forensics Casework](labs/04-endpoint-forensics-casework/)  
-  Triage MFT and EVTX artifacts, build a timeline, package IOCs, and uplift findings into Sentinel content.
+## Tools used
 
-- [05 — Windows Memory Forensics + Cloud SecOps Loop](labs/05-memory-forensics-cloud-secops-loop/)  
-  Document Azure memory-acquisition constraints, pivot to process-memory proof, and complete the Sentinel hunt-to-response loop.
+- Microsoft Sentinel, Log Analytics, Microsoft Entra ID, KQL, AMA/DCR
+- Sysmon, Windows event logs, KAPE, MFTECmd, EvtxECmd, Timeline Explorer
+- Process dumps and strings extraction; attempted Volatility 3 analysis documented in Lab 05
+- GuardDuty, Security Hub, EventBridge, SNS, Lambda, S3, Athena, and KMS
+- GitHub Actions, Azure Bicep, Terraform, and GitHub OIDC
 
-## All completed labs
+## Using the material
 
-| Lab | Focus | Status |
-|---|---|---|
-| [01 — Telemetry + SIEM Validation](labs/01-telemetry-siem-validation/) | Validate AMA/DCR onboarding and prove Heartbeat, Sysmon, and Security event ingestion in Sentinel | Complete |
-| [02 — Multi-Host Incident Reconstruction](labs/02-incident-reconstruction/) | Correlate cross-host activity into a timeline and operationalize the result as detection, automation, and workbook content | Complete |
-| [03 — Controls-to-Telemetry Audit](labs/03-controls-to-telemetry-audit/) | Test which security controls are observable and document gaps with validation queries and a coverage matrix | Complete |
-| [04 — Endpoint Forensics Casework](labs/04-endpoint-forensics-casework/) | Triage MFT and EVTX artifacts, build a timeline, package IOCs, and uplift findings into Sentinel content | Complete |
-| [05 — Windows Memory Forensics + Cloud SecOps Loop](labs/05-memory-forensics-cloud-secops-loop/) | Document Azure memory-acquisition constraints, pivot to process-memory proof, and complete the Sentinel hunt-to-response loop | Complete |
-| [06 — Entra ID Detection Engineering + Gated Content Pipeline](labs/06-entra-id-detection-engineering-gated-content-pipeline/) | Validate Entra telemetry, build identity detections and triage content, and prove a gated GitHub OIDC validation/package/test-deploy path into a separate Sentinel workspace | Complete |
-| [07 — AWS GuardDuty Detection + Response](labs/07-aws-guardduty-detection-response/) | Build AWS-native alerting, finding retention, Athena triage, and a Security Hub-driven response workflow | Complete |
+Start with a lab README and its evidence links. Queries and templates use lab-specific hosts, tables, resource names, and thresholds; review those values before trying them in your own disposable environment. Cloud deployments can incur costs. Follow each lab's cleanup notes.
 
-## Planned labs
+Screenshots record earlier lab runs. Offline checks validate selected code and content; they do not replay those investigations or verify a current cloud deployment. Detection rules need tuning for normal administrative activity.
 
-| Lab | Focus | Status |
-|---|---|---|
-| 08 — Secure EKS AI Platform | Planned flagship lab for GitHub OIDC deployment, EKS Pod Identity, signed-image enforcement, platform hardening, runtime detection, AI abuse telemetry, and Security Hub response | Planned |
-| 09 — AWS IAM + S3 Misconfiguration Response | Planned posture and remediation lab focused on unintended access, attribution, and control validation | Planned |
+Raw event logs, memory dumps, credentials, and Terraform state belong outside this repository. See the lab notes for collection methods and redactions.
 
-## Core stack
+## Offline checks
 
-- **Microsoft security:** Microsoft Sentinel, Log Analytics, Microsoft Entra ID, AMA/DCR, KQL
-- **Windows DFIR:** Sysmon, Windows Security Events, KAPE, MFTECmd, EvtxECmd, Timeline Explorer, Volatility 3
-- **AWS security:** GuardDuty, Security Hub, IAM Access Analyzer, AWS Config, CloudTrail
-- **Automation and deployment:** GitHub Actions, GitHub OIDC, Azure Bicep, Terraform, EventBridge, SNS, Lambda
-- **Cloud investigation:** S3, Athena
+GitHub Actions runs Python unit tests and the Lab 06 content validators, plus mocked Pester tests for the Lab 03 harness. From the repository root:
 
-## Notes
-- Labs that create billable cloud services include teardown or cleanup guidance.
+```text
+python -m pip install pyyaml
+python -m unittest discover -s tests -v
+```
 
-_Last updated: 2026-03-18_
+With Pester 5.7.1 loaded, run `Invoke-Pester ./tests/Lab03Harness.Tests.ps1`. These tests mock local account/task commands and AWS calls. KQL and Athena queries still require testing against the relevant lab data. Local Windows PowerShell 5.1 testing was blocked by a Pester module-loading policy; the harness tests have been run with PowerShell 7.
+
+## Possible next labs
+
+AWS IAM/S3 misconfiguration investigation and EKS security are planned topics. No completed results are claimed for them here.

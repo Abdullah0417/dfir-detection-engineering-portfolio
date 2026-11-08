@@ -19,7 +19,7 @@ Full-RAM acquisition in Azure repeatedly produced images that Volatility could n
   - [screenshots/02_volatility_failure_pdbscan_no_kernels.png](screenshots/02_volatility_failure_pdbscan_no_kernels.png)
   - [screenshots/03_memdump_zero_above_4gb.png](screenshots/03_memdump_zero_above_4gb.png)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="memory-backed-proof-process-memory-dump--strings"></a>
 ## Memory-backed proof (process-memory dump + strings)
@@ -43,7 +43,7 @@ Hash-only tracking:
 - [notes/evidence_manifest.csv](notes/evidence_manifest.csv)
 - [notes/chain_of_custody.md](notes/chain_of_custody.md)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="sentinel-hunts-kql"></a>
 ## Sentinel hunts (KQL)
@@ -54,6 +54,7 @@ These hunts turn `EncodedCommand` from a generic signal into evidence-rich telem
 - Proof: [screenshots/10_sentinel_sysmon_eid1_encodedcommand.png](screenshots/10_sentinel_sysmon_eid1_encodedcommand.png)
 
 ### 2) Decode the EncodedCommand payload
+The KQL decoder supports the ASCII canary used here by removing NUL characters from decoded UTF-16LE bytes. Non-ASCII payloads may decode incorrectly. This query reads command-line telemetry; the process-dump strings are separate evidence.
 - KQL: [kql/02_decode_encodedcommand_from_rendereddescription.kql](kql/02_decode_encodedcommand_from_rendereddescription.kql)
 - Proof: [screenshots/11_kql_decode_encodedcommand.png](screenshots/11_kql_decode_encodedcommand.png)
 
@@ -61,13 +62,14 @@ These hunts turn `EncodedCommand` from a generic signal into evidence-rich telem
 - KQL: [kql/03_correlate_eid1_eid3_by_processguid.kql](kql/03_correlate_eid1_eid3_by_processguid.kql)
 - Proof: [screenshots/12_kql_correlate_eid1_eid3_processguid.png](screenshots/12_kql_correlate_eid1_eid3_processguid.png)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="detection--automation-rules-as-code"></a>
 ## Detection + automation (rules-as-code)
-I operationalized the hunt into a repeatable detection and an auto-response.
+I used the hunt in a scheduled detection and added incident tagging and severity updates.
 
 ### Scheduled analytic rule (exported)
+The rule matches an encoded blob even if decoding fails. Its current export title reflects that; earlier screenshots use the original title. The one-hour lookback runs every five minutes and can alert repeatedly on the same event.
 - Export: [detections/LAB05_encoded_powershell_decoded_rule.json](detections/LAB05_encoded_powershell_decoded_rule.json)
 - Tuning notes: [detections/tuning_notes.md](detections/tuning_notes.md)
 - Proof:
@@ -81,22 +83,22 @@ I operationalized the hunt into a repeatable detection and an auto-response.
   - [screenshots/15_automation_rule_config.png](screenshots/15_automation_rule_config.png)
   - [screenshots/01_incident_tagged_high_lab05.png](screenshots/01_incident_tagged_high_lab05.png)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="workbook-case-view"></a>
 ## Workbook (case view)
-A recruiter-friendly dashboard that shows:
+A investigation dashboard that shows:
 - latest canary execution
 - hit counts
 - decoded payload preview
 - correlated egress
 
 - Export: [workbooks/LAB05_case_view_workbook.json](workbooks/LAB05_case_view_workbook.json)
-- Hero proof: [screenshots/00_workbook_case_view.png](screenshots/00_workbook_case_view.png)
+- Screenshot: [screenshots/00_workbook_case_view.png](screenshots/00_workbook_case_view.png)
 
 > Note: workbook export includes `<SUBSCRIPTION_ID>` placeholders. See [notes/redactions.md](notes/redactions.md).
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="ioc-pack"></a>
 ## IOC pack
@@ -107,14 +109,14 @@ A small, publish-safe IOC list derived from:
 - IOC CSV: [ioc/memory_triage_iocs.csv](ioc/memory_triage_iocs.csv)
 - Method notes: [ioc/README.md](ioc/README.md)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="mitre-mapping"></a>
 ## MITRE mapping
 - Mapping table: [mitre/LAB05_mitre_mapping.md](mitre/LAB05_mitre_mapping.md)
 - Navigator layer: [mitre/LAB05_attack_navigator_layer.json](mitre/LAB05_attack_navigator_layer.json)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
 
 <a id="if-you-only-have-90-seconds"></a>
 ## If you only have 90 seconds
@@ -127,4 +129,4 @@ A small, publish-safe IOC list derived from:
    - [kql/02_decode_encodedcommand_from_rendereddescription.kql](kql/02_decode_encodedcommand_from_rendereddescription.kql)
    - [kql/03_correlate_eid1_eid3_by_processguid.kql](kql/03_correlate_eid1_eid3_by_processguid.kql)
 
-[Back to top](#lab-05--memory-forensics--cloud-secops-loop-microsoft-sentinel)
+[Back to top](#05--memory-forensics--cloud-secops-loop-microsoft-sentinel)

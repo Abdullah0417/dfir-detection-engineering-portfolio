@@ -2,12 +2,20 @@ name: validate-lab06-content
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     paths:
       - '.github/workflows/validate-lab06-content.yml'
       - '.github/workflows/package-lab06-content.yml'
       - '.github/workflows/lab06-oidc-smoke-test.yml'
+      - '.github/workflows/deploy-lab06-test.yml'
       - 'labs/06-entra-id-detection-engineering-gated-content-pipeline/**'
+      - 'labs/07-aws-guardduty-detection-response/automation/response/**'
+      - 'labs/03-controls-to-telemetry-audit/notes/*.ps1'
+      - 'tests/**'
+
+permissions:
+  contents: read
 
 jobs:
   validate:
@@ -17,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,6 +35,9 @@ jobs:
 
       - name: Install validator dependency
         run: python -m pip install --upgrade pip pyyaml
+
+      - name: Run offline unit tests
+        run: python -m unittest discover -s tests -v
 
       - name: Validate repo structure and hygiene
         run: python "${LAB06_DIR}/scripts/validate_repo.py" "${LAB06_DIR}"
@@ -40,3 +53,25 @@ jobs:
 
       - name: Validate README evidence
         run: python "${LAB06_DIR}/scripts/validate_readme_evidence.py" "${LAB06_DIR}"
+
+  harness-tests:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Pester
+        run: Install-Module Pester -RequiredVersion 5.7.1 -Repository PSGallery -Scope CurrentUser -Force -SkipPublisherCheck -ErrorAction Stop
+      - name: Parse PowerShell and run mocked harness tests
+        run: |
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors)
+            if ($errors.Count) { throw ($errors | Out-String) }
+          }
+          Import-Module Pester -RequiredVersion 5.7.1
+          Invoke-Pester -Path ./tests/Lab03Harness.Tests.ps1 -CI -Output Detailed

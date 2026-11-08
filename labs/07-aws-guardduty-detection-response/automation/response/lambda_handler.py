@@ -31,18 +31,22 @@ def lambda_handler(event, context):
         },
     )
 
+    unprocessed = response.get("UnprocessedFindings", [])
+    if unprocessed:
+        # A returned error must fail the invocation so Lambda can retry it.
+        raise RuntimeError(f"Security Hub did not update the finding: {unprocessed}")
+
     print(
         json.dumps(
             {
                 "finding_id": finding_id,
                 "product_arn": product_arn,
                 "workflow_status": "NOTIFIED",
-                "unprocessed_findings": response.get("UnprocessedFindings", []),
             }
         )
     )
 
     return {
-        "ok": len(response.get("UnprocessedFindings", [])) == 0,
+        "ok": True,
         "finding_id": finding_id,
     }
