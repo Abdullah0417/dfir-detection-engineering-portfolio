@@ -42,4 +42,4 @@ Search for anything that looks like an Azure identifier or identity:
 
 ## Harness credential review
 
-The original harness and its output screenshot contained a fixed lab-account password. The script now prompts for a password, and the screenshot has been removed from the current tree. Historical commits still contain the old value. Remove the account or change its password if the old lab remains active, and change that password anywhere it was reused.
+The original harness and its output screenshot contained a fixed lab-account password. The current screenshot masks only the password value; all other pixels match the original. The script now prompts for a password and previews changes by default. The original lab environment has been deleted. Historical commits still contain the old password; this review does not rewrite history.

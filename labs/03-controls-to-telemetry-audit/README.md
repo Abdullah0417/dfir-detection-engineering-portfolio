@@ -127,6 +127,7 @@ Update:
 
 ## Evidence (screenshots)
 - Repo structure: [`screenshots/00_repo_structure.png`](screenshots/00_repo_structure.png)
+- [Control test harness output](screenshots/01_control_test_harness_output.png) — Historical lab execution screenshot. The password has been redacted; the remaining output is unchanged. The current script prompts for a unique password and previews changes by default.
 - Heartbeat validation: [`screenshots/02_validation_heartbeat.png`](screenshots/02_validation_heartbeat.png)
 - Sysmon validation: [`screenshots/03_validation_sysmon_eid1.png`](screenshots/03_validation_sysmon_eid1.png) · [`screenshots/04_validation_sysmon_eid3.png`](screenshots/04_validation_sysmon_eid3.png)
 - Security validation: [`screenshots/05_validation_4624.png`](screenshots/05_validation_4624.png) · [`screenshots/06_validation_4625.png`](screenshots/06_validation_4625.png) · [`screenshots/07_validation_4732.png`](screenshots/07_validation_4732.png) · [`screenshots/08_validation_4698.png`](screenshots/08_validation_4698.png) · [`screenshots/09_validation_4719.png`](screenshots/09_validation_4719.png)
