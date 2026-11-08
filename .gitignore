@@ -49,3 +49,7 @@ labs/06-entra-id-detection-engineering-gated-content-pipeline/artifacts/
 
 # Lab06 local workflow runtime artifacts
 labs/*.zip
+
+# Python test caches
+__pycache__/
+*.py[cod]

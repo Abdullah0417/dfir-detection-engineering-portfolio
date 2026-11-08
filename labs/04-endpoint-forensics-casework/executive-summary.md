@@ -1,6 +1,6 @@
 ﻿# Executive Summary — (Endpoint Forensics Casework)
 
-## What happened (high confidence)
+## Controlled test activity
 - A PowerShell script was dropped into %APPDATA%\AdobeUpdate\adobeupdate.ps1 and executed on win-ws1.
 - A scheduled task (AdobeUpdateSvc) was created to persist execution at user logon, launching PowerShell with bypass-style flags.
 
@@ -17,7 +17,7 @@
 - Collected triage artifacts and generated a SHA256 evidence manifest.
 - Correlated file system + event telemetry into a UTC timeline.
 - Published a small IOC pack (publish-safe) derived from validated evidence.
-- Shipped Sentinel uplift: hunts, analytic rule, incident proof, automation rule, and workbook.
+- Created Sentinel content: hunts, analytic rule, incident proof, automation rule, and workbook.
 
 ## Recommendations
 - Alert on PowerShell launched from user profile paths with suspicious flags (e.g., -ExecutionPolicy Bypass, -WindowStyle Hidden) and script execution from %APPDATA%.

@@ -7,7 +7,8 @@ This note records the GitHub OIDC trust path used for the Lab 06 test deployment
 ## GitHub side
 
 - Org: `Abdullah0417`
-- Repo: `dfir-labs`
+- Repository name at the time of the recorded run: `dfir-labs`
+- Current repository: `dfir-detection-engineering-portfolio`. Before rerunning deployment, verify that the Azure federated credential subject matches the current repository and `sentinel-test` environment. The historical screenshots do not verify the current trust configuration.
 - Environment: `sentinel-test`
 - Protection mode: required reviewer enabled, protected branch deployment gate in place
 

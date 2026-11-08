@@ -1,6 +1,7 @@
 // Hunt: decode EncodedCommand from RenderedDescription
-// Purpose: Extract the Base64 blob from the PowerShell command line and decode it to show the in-memory script content.
-// Why it matters: Turns a high-noise indicator (-EncodedCommand) into an evidence-rich signal (decoded payload).
+// Extract the logged command line; memory evidence is collected separately.
+// NUL removal works for this lab's ASCII canary encoded as UTF-16LE.
+// This is not a general UTF-16 decoder; non-ASCII payloads can be missing or incorrect.
 
 Event
 | where TimeGenerated > ago(24h)

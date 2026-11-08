@@ -1,12 +1,12 @@
 # Endpoint Forensics Casework (MFT + EVTX)
 
-**Quick links:** [What this proves](#what-this-proves) · [Scenario & scope](#scenario-and-scope) · [Data sources](#data-sources-used) · [Workflow](#workflow) · [Key findings](#key-findings) · [Detections](#detections-shipped) · [Automation](#automation-shipped) · [Workbooks](#workbooks-shipped) · [MITRE](#mitre-mapping) · [IOCs](#iocs) · [Recommendations](#recommendations) · [Repro steps](#repro-steps) · [Artifacts index](#artifacts-index)
+**Quick links:** [What I tested](#what-this-proves) · [Scenario & scope](#scenario-and-scope) · [Data sources](#data-sources-used) · [Workflow](#workflow) · [Key findings](#key-findings) · [Detections](#detections-shipped) · [Automation](#automation-shipped) · [Workbooks](#workbooks-shipped) · [MITRE](#mitre-mapping) · [IOCs](#iocs) · [Recommendations](#recommendations) · [Repro steps](#repro-steps) · [Artifacts index](#artifacts-index)
 
 <a id="what-this-proves"></a>
-## 1) What this proves
+## 1) What I tested
 - I can run **endpoint triage** and preserve evidence boundaries ([hash manifest](notes/evidence_manifest.csv) + [chain-of-custody](notes/chain_of_custody.md); no raw artifacts published).
 - I can **correlate disk artifacts (MFT)** with **Windows event telemetry (EVTX/Sentinel)** to build an incident [timeline](notes/timeline.md).
-- I can translate forensic findings into **SIEM uplift**: hunts → [scheduled analytic rule](#detections-shipped) → [automation](#automation-shipped) → [workbook](#workbooks-shipped).
+- I can translate forensic findings into **Sentinel detections**: hunts → [scheduled analytic rule](#detections-shipped) → [automation](#automation-shipped) → [workbook](#workbooks-shipped).
 - I can produce a **publish-safe IOC pack** ([hashes + paths + persistence artifacts](ioc/malware_triage_iocs.csv)) without uploading samples.
 
 <a id="scenario-and-scope"></a>
@@ -54,14 +54,14 @@ A controlled, benign “persistence-style” scenario was executed on a single W
 - **Sentinel hunts** returned matching events (process execution + task creation).
   - Evidence: [screenshots/11_sentinel_hunt_results.png](screenshots/11_sentinel_hunt_results.png)
   - Hunts used: [section 6](#detections-shipped)
-- **Detection + response uplift delivered:** scheduled analytic rule, incident creation, automation rule, and workbook.
+- **Detection and incident handling:** scheduled analytic rule, incident creation, automation rule, and workbook.
   - Analytic rule proof: [screenshots/12_analytic_rule_mitre_mapping.png](screenshots/12_analytic_rule_mitre_mapping.png)
   - Incident proof: [screenshots/13_incident_triggered.png](screenshots/13_incident_triggered.png)
   - Automation proof (redacted): [screenshots/14_automation_rule.png](screenshots/14_automation_rule.png)
   - Workbook proof: [screenshots/15_workbook_overview.png](screenshots/15_workbook_overview.png)
   - Related sections: [Detections](#detections-shipped) · [Automation](#automation-shipped) · [Workbooks](#workbooks-shipped)
 
-### Artifact → detection mapping (how the casework becomes SIEM uplift)
+### Artifact → detection mapping (how the casework becomes Sentinel detections)
 | Artifact finding | Hunt | Scheduled rule | Automation | Workbook |
 |---|---|---|---|---|
 | AppData script write (MFT) | N/A (disk artifact) | N/A | N/A | N/A |
@@ -74,6 +74,7 @@ Full timeline (UTC): [notes/timeline.md](notes/timeline.md)
 ## 6) Detections shipped
 ### Scheduled analytic rule
 - **Name:** `LAB04 - PowerShell persistence-style script execution from AppData`
+- **Scope:** the specific AdobeUpdate canary path; this is not a general detector for all AppData script execution.
 - **Severity:** High
 - **Schedule:** every 5 minutes over the last 1 hour
 - **Entity mapping:** Host (`Computer` → `HostName`)
@@ -204,4 +205,4 @@ These steps are intended for a **controlled lab VM you own**.
 - [screenshots/14_automation_rule.png](screenshots/14_automation_rule.png)
 - [screenshots/15_workbook_overview.png](screenshots/15_workbook_overview.png)
 
-[Back to top](#lab-04--endpoint-forensics-casework-mft--evtx)
+[Back to top](#endpoint-forensics-casework-mft--evtx)

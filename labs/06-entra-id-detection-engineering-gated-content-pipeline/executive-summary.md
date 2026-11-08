@@ -1,10 +1,7 @@
-# Executive Summary
+# Lab summary — Entra ID detections
 
-This lab shows practical Microsoft Sentinel detection engineering built around Microsoft Entra ID telemetry. The point was not to make a vague platform claim. The point was to show a clean workflow: validate the data, build the hunts, promote the strongest logic into scheduled analytics, add minimal triage context, and keep the resulting content reviewable and safe to publish.
+I used controlled Entra ID activity to build three Sentinel detections: failed sign-in bursts, directory role changes, and service principal update candidates. The lab includes the KQL, rule exports, an incident-tagging rule, a workbook, and screenshots of the recorded runs.
 
-I built three identity-focused detections in Sentinel. The first looks for a failed sign-in burst from one IP across multiple users. The second tracks directory role assignment changes. The third watches for service principal credential additions. I also added a small identity workbook so the results are easier to review and a lightweight automation rule so the lab shows a basic investigation and response flow instead of stopping at query output.
+The GitHub Actions workflow uses OIDC to authenticate to Azure, validates and packages content, checks an ARM what-if result, and deploys a workbook to a separate test workspace after environment approval. The Bicep wrapper deploys only the workbook. Analytics and automation exports require separate import and testing.
 
-I also proved the gated path around the content. The repo includes the exported detection content, the deploy wrapper, and the proof chain for GitHub OIDC, validation checks, packaging, ARM `what-if`, approval, and controlled deployment into a separate test workspace. That claim stays narrow on purpose: this is a portfolio-scale gated content pipeline, not a finished enterprise release program.
-
-From a technical review perspective, this lab shows that I can validate Entra telemetry before I write detections, use KQL against real identity activity instead of canned sample data, turn hunt logic into scheduled analytics with usable mappings and incident creation, and document the deployment path without overstating what was built.
-
+The service principal query also matches general updates; its results require review before confirming a credential addition. The queries need tuning for shared IP addresses, normal administrative changes, and the events available in the target tenant. Static validation does not execute KQL or establish detection accuracy. See the [lab README](README.md) for evidence and reproduction notes.

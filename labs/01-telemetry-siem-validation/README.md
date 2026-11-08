@@ -10,7 +10,7 @@ Validate end-to-end Windows telemetry ingestion (Heartbeat + Sysmon + Security a
 - Log Analytics Workspace: law-dfir
 - Collection: Azure Monitor Agent (AMA) + Data Collection Rule (DCR)
 - Evidence root(local, not published casework): C:\Evidence\Cases\2026-01-29_WinWS1_TestIR
-- Repo root: labs\lab-01-telemetry-siem-validation
+- Lab directory: `labs/01-telemetry-siem-validation/`
 
 ## What I configured
 - Deployed `win-ws1` in a lab VNet and enforced network access controls (no open Internet RDP)
@@ -44,7 +44,7 @@ Validate end-to-end Windows telemetry ingestion (Heartbeat + Sysmon + Security a
 - [Security auth (4624/4625)](kql/03_security_auth_4624_4625.kql)
 - [event log volume last 1hr](kql/04_event_log_volume_last_1h.kql)
 
-## How to reproduce (5 minutes)
+## Check ingestion in an existing lab
 1. Open Sentinel → Logs (law-dfir).
 2. Run the KQL files in `/kql` in order.
 3. Confirm rows return for Heartbeat, Sysmon, and Security events.

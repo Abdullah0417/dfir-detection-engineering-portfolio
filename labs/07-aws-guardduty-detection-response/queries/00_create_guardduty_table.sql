@@ -15,5 +15,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS gd_logs (
   description string
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
-LOCATION 's3://lab07-guardduty-013052902523-us-east-1-findings/AWSLogs/013052902523/GuardDuty/'
+-- Replace the bucket name and example account ID with your own export location.
+LOCATION 's3://example-guardduty-findings/AWSLogs/111122223333/GuardDuty/'
 TBLPROPERTIES ('has_encrypted_data'='true');

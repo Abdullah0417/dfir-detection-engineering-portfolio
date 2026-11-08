@@ -27,5 +27,5 @@ expected
 | extend Status = iff(isnotempty(LastSeen), "PASS", "MISSING")
 | where Status == "MISSING"
 | extend PriorityRank = case(Priority=="Critical", 1, Priority=="High", 2, Priority=="Medium", 3, 4)
-| project Priority, Computer, Signal
 | sort by PriorityRank asc, Computer asc, Signal asc
+| project Priority, Computer, Signal

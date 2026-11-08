@@ -2,13 +2,13 @@
 
 ![Architecture diagram](screenshots/architecture_diagram.png)
 
-## What this proves
+## What I tested
 - I built an AWS-native detection and response baseline with Terraform using GuardDuty, Security Hub, EventBridge, SNS, Lambda, S3, Athena, and KMS.
 - I kept alerting and response as two separate workflows: GuardDuty to EventBridge to SNS for analyst notification, and Security Hub to EventBridge to Lambda for automated first response.
 - I retained GuardDuty findings to S3, applied a lifecycle rule, and queried the exported dataset with Athena instead of relying on console-only visibility.
 - I used Security Hub as the normalized ASFF finding layer for response logic and investigation pivots.
 - I documented a real lab constraint honestly: Security Hub was enabled after the first sample-finding batch, so the Lambda response path was validated against the second batch, and one finding was manually updated by CLI to show `NOTIFIED` cleanly in the console.
-- I packaged the lab as publish-safe recruiter artifacts only: screenshots, SQL queries, event patterns, Lambda code, Terraform, IOC details, and notes.
+- I packaged the lab as lab artifacts: screenshots, SQL queries, event patterns, Lambda code, Terraform, IOC details, and notes.
 
 ## Scenario and scope
 This lab simulates an AWS-native SecOps workflow in a single AWS account and a single Region: `us-east-1`.
@@ -34,7 +34,7 @@ Security Hub was enabled after the first sample-finding batch. That timing matte
 - **Decision:** generate a second sample-finding batch after Security Hub was enabled so EventBridge could invoke Lambda on Security Hub imported findings.
 - **Evidence:** Lambda CloudWatch logs showed successful `workflow_status = NOTIFIED` updates for the second batch, and one finding was also updated manually by CLI so the final `NOTIFIED` state was easy to show in the Security Hub console.
 
-That manual CLI step was not used to fake the workflow. It was used to make the final console proof legible after the timing issue had already been understood and documented.
+The console screenshot shows the final state. By itself, it cannot establish whether Lambda or the manual CLI update produced that state.
 
 ## Architecture and data flow
 The lab uses AWS-native services end to end:
@@ -80,7 +80,7 @@ The Terraform layer creates:
 ## S3 retention and Athena triage
 ![S3 lifecycle rule](screenshots/s3_lifecycle_rule.png)
 
-The findings bucket is not just storage. It is the long-term retention and hunting path for the lab.
+The S3 bucket retains findings for later queries.
 
 - Objects transition to Standard-IA after 30 days.
 - Objects expire after 90 days.
@@ -114,7 +114,7 @@ Artifacts:
 ## Response path proof
 ![Security Hub workflow state set to NOTIFIED](screenshots/06_response_executed.png)
 
-The response workflow is separate from notification and does one defensible thing well:
+The response workflow updates the finding for triage:
 
 - **Source:** Security Hub imported GuardDuty findings in ASFF
 - **Filter:** GuardDuty findings with `Workflow.Status = NEW` and `RecordState = ACTIVE`

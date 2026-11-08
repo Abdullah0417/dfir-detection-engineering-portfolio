@@ -3,7 +3,7 @@
 ## Summary
 I investigated repeated PowerShell executions using `-EncodedCommand` on an Azure VM (`win-ws1`) and converted that investigation into an operational Sentinel workflow:
 - Hunts that **decode the payload**
-- A scheduled analytic rule that alerts on decoded payload presence
+- A scheduled analytic rule that alerts on encoded-command candidates and attempts to decode the canary
 - An automation rule that tags incidents (`lab05`) and escalates severity
 - A “case view” workbook for fast triage
 
@@ -14,7 +14,7 @@ Encoded PowerShell is a common tradecraft pattern for:
 - hiding intent from basic logging
 - staging multi-line scripts without dropping files
 
-If you can’t decode and operationalize it, you end up with noisy alerts and slow investigations.
+Decoding the command line helps inspect the test payload. Encoding alone does not establish malicious intent.
 
 ## What I observed
 - Sysmon EID 1 showed `powershell.exe` launched with `-EncodedCommand` on `win-ws1`.
@@ -47,7 +47,7 @@ If you can’t decode and operationalize it, you end up with noisy alerts and sl
 - Consider adding identity and cloud posture signals (Entra ID, Defender for Cloud) if licensing and cost allow.
 
 ## Proof / evidence pointers
-- Workbook hero view: `screenshots/00_workbook_case_view.png`
+- Workbook view: `screenshots/00_workbook_case_view.png`
 - Incident automation proof: `screenshots/01_incident_tagged_high_lab05.png`
 - Memory strings proof: `screenshots/08_strings_hits_canary_markers.png`, `screenshots/09_strings_hits_encoded_commandline.png`
 - Rule exports: `detections/`, `automation/`, `workbooks/`

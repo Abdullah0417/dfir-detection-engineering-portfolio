@@ -55,6 +55,7 @@ def main() -> int:
         workflows_dir / "lab06-oidc-smoke-test.yml",
         workflows_dir / "validate-lab06-content.yml",
         workflows_dir / "package-lab06-content.yml",
+        workflows_dir / "deploy-lab06-test.yml",
     ]
 
     docs: dict[str, dict] = {}
@@ -70,6 +71,20 @@ def main() -> int:
             docs[wf.name] = yaml.safe_load(text) or {}
         except Exception as exc:
             errors.append({"path": rel(wf, repo_root), "message": f"Invalid YAML: {exc}"})
+
+    for name in ["lab06-oidc-smoke-test.yml", "deploy-lab06-test.yml"]:
+        doc = docs.get(name, {})
+        triggers = doc.get(True, doc.get("on", {}))
+        if not isinstance(triggers, dict) or set(triggers) != {"workflow_dispatch"}:
+            errors.append({"path": f".github/workflows/{name}", "message": "Cloud workflows must be manual-only."})
+        if doc.get("permissions", {}).get("id-token") != "write" or not find_uses(doc, "azure/login@v2"):
+            errors.append({"path": f".github/workflows/{name}", "message": "Cloud workflows must use Azure OIDC login."})
+        for job in doc.get("jobs", {}).values():
+            environment = job.get("environment")
+            if isinstance(environment, dict):
+                environment = environment.get("name")
+            if environment != "sentinel-test":
+                errors.append({"path": f".github/workflows/{name}", "message": "Cloud jobs must use the sentinel-test environment."})
 
     smoke = docs.get("lab06-oidc-smoke-test.yml", {})
     if smoke:

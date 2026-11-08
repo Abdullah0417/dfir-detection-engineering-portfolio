@@ -39,3 +39,7 @@ Search for anything that looks like an Azure identifier or identity:
 - Lab hostnames (`win-ws1`, `win-ws2`)
 - KQL logic, event IDs, table names
 - Canary identifiers listed in `ioc/canary_identifiers.md`
+
+## Harness credential review
+
+The original harness and its output screenshot contained a fixed lab-account password. The script now prompts for a password, and the screenshot has been removed from the current tree. Historical commits still contain the old value. Remove the account or change its password if the old lab remains active, and change that password anywhere it was reused.

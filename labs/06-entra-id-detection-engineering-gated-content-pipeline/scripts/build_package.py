@@ -29,21 +29,33 @@ def main() -> int:
         return 1
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    file_list = manifest.get("packageIncludes", [])
+    if not isinstance(file_list, list) or not file_list:
+        print("packageIncludes must be a non-empty list of relative file paths.")
+        return 1
+    inputs = []
+    seen = set()
+    for relative in file_list:
+        if not isinstance(relative, str) or Path(relative).is_absolute():
+            print("Package inputs must be relative file paths.")
+            return 1
+        src = (lab_dir / relative).resolve()
+        if not src.is_relative_to(lab_dir) or not src.is_file() or src in seen:
+            print(f"Missing, duplicate, or out-of-lab package input: {relative}")
+            return 1
+        seen.add(src)
+        inputs.append((src, src.relative_to(lab_dir).as_posix()))
+
     dist_dir = lab_dir / "dist"
     dist_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     package_name = f"lab06-content-package-{timestamp}.zip"
     package_path = dist_dir / package_name
-    file_list = manifest.get("packageIncludes", [])
 
     package_entries = []
     with ZipFile(package_path, "w", compression=ZIP_DEFLATED) as archive:
-        for relative in file_list:
-            src = lab_dir / relative
-            if not src.exists() or not src.is_file():
-                print(f"Missing package input: {relative}")
-                return 1
+        for src, relative in inputs:
             archive.write(src, arcname=relative)
             package_entries.append(
                 {

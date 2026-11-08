@@ -7,7 +7,8 @@ let failureBursts =
     | summarize
         FailureCount=count(),
         DistinctUsers=dcount(UserPrincipalName),
-        FailedUsers=make_set(UserPrincipalName, 20)
+        FailedUsers=make_set(UserPrincipalName, 20),
+        LastFailure=max(TimeGenerated)
       by IPAddress, BurstWindowStart=bin(TimeGenerated, burstWindow)
     | where FailureCount >= 5 and DistinctUsers >= 3
     | extend BurstWindowEnd = BurstWindowStart + burstWindow;
@@ -18,6 +19,6 @@ let successes =
     | project SuccessTime=TimeGenerated, IPAddress, UserPrincipalName, AppDisplayName, ResultDescription;
 failureBursts
 | join kind=inner successes on IPAddress
-| where SuccessTime between (BurstWindowEnd .. BurstWindowEnd + successWindow)
-| project IPAddress, FailureCount, DistinctUsers, FailedUsers, BurstWindowStart, BurstWindowEnd, SuccessTime, UserPrincipalName, AppDisplayName
+| where SuccessTime > LastFailure and SuccessTime <= LastFailure + successWindow
+| project IPAddress, FailureCount, DistinctUsers, FailedUsers, BurstWindowStart, BurstWindowEnd, LastFailure, SuccessTime, UserPrincipalName, AppDisplayName
 | order by SuccessTime desc

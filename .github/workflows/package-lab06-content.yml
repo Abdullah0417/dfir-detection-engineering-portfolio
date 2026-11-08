@@ -9,7 +9,11 @@ on:
       - '.github/workflows/package-lab06-content.yml'
       - '.github/workflows/validate-lab06-content.yml'
       - '.github/workflows/lab06-oidc-smoke-test.yml'
+      - '.github/workflows/deploy-lab06-test.yml'
       - 'labs/06-entra-id-detection-engineering-gated-content-pipeline/**'
+
+permissions:
+  contents: read
 
 jobs:
   package:
@@ -19,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5

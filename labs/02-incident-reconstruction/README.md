@@ -1,14 +1,14 @@
 # Multi-host Incident Reconstruction (Microsoft Sentinel + Sysmon)
 
-**Quick links:** [Timeline KQL](kql/lab02_timeline.kql) · [Analytic rule export](detections/LAB02_encoded_powershell_rule.arm.json) · [Automation export](automation/AB02_soar_lite_automation_rule.arm.json) · [Workbook template](workbooks/LAB02_timeline_dashboard.galleryTemplate.json) · [Executive summary](executive-summary.md)
+**Quick links:** [Timeline KQL](kql/lab02_timeline.kql) · [Analytic rule export](detections/LAB02_encoded_powershell_rule.arm.json) · [Automation export](automation/LAB02_soar_lite_automation_rule.arm.json) · [Workbook template](workbooks/LAB02_timeline_dashboard.galleryTemplate.json) · [Executive summary](executive-summary.md)
 
-## What this proves
+## What I tested
 
 - Multi-host endpoint telemetry ingestion into Sentinel (`win-ws1`, `win-ws2`) validated via `Heartbeat` and Windows Event Logs.
 - Cross-host reconstruction using a single **timeline query** that correlates Sysmon + Security events.
 - Hunt → **Scheduled analytic rule** shipped: `LAB02 - Encoded PowerShell Execution` (MITRE `T1059.001`).
 - **SOAR-lite automation** shipped: tag + severity escalation on incident creation.
-- **Workbook dashboard** shipped for “client-ready” investigation views.
+- **Workbook dashboard** for reviewing the timeline.
 
 ## Topology (lab)
 
@@ -35,7 +35,7 @@ Queries parse it using `parse_xml()` and build a bag to extract fields like `Ima
 - Executive summary: [executive-summary.md](executive-summary.md)
 - KQL queries: [kql/](kql/)
 - Analytic rule export (ARM): [detections/LAB02_encoded_powershell_rule.arm.json](detections/LAB02_encoded_powershell_rule.arm.json)
-- Automation rule export (ARM): [automation/AB02_soar_lite_automation_rule.arm.json](automation/AB02_soar_lite_automation_rule.arm.json)
+- Automation rule export (ARM): [automation/LAB02_soar_lite_automation_rule.arm.json](automation/LAB02_soar_lite_automation_rule.arm.json)
 - Workbook template: [workbooks/LAB02_timeline_dashboard.galleryTemplate.json](workbooks/LAB02_timeline_dashboard.galleryTemplate.json)
 - IOC list (lab-scoped): [ioc/ioc_list.csv](ioc/ioc_list.csv)
 - MITRE mapping: [mitre/mitre_mapping.md](mitre/mitre_mapping.md)
@@ -45,9 +45,9 @@ Queries parse it using `parse_xml()` and build a bag to extract fields like `Ima
 
 ## Import / Deploy (Portal)
 
-This lab ships deployable exports:
+This lab includes templates to adapt to your workspace:
 - Analytic rule (ARM): [detections/LAB02_encoded_powershell_rule.arm.json](detections/LAB02_encoded_powershell_rule.arm.json)
-- Automation rule (ARM): [automation/AB02_soar_lite_automation_rule.arm.json](automation/AB02_soar_lite_automation_rule.arm.json)
+- Automation rule (ARM): [automation/LAB02_soar_lite_automation_rule.arm.json](automation/LAB02_soar_lite_automation_rule.arm.json)
 - Workbook template: [workbooks/LAB02_timeline_dashboard.galleryTemplate.json](workbooks/LAB02_timeline_dashboard.galleryTemplate.json)
 
 > Prereqs: Microsoft Sentinel enabled on the workspace, and you have **Contributor** (or higher) on the resource group + workspace.
@@ -74,7 +74,7 @@ This lab ships deployable exports:
 1. Azure Portal → **Deploy a custom template**
 2. Click **Build your own template in the editor**
 3. Click **Load file** → upload:
-   - [automation/AB02_soar_lite_automation_rule.arm.json](automation/AB02_soar_lite_automation_rule.arm.json)
+   - [automation/LAB02_soar_lite_automation_rule.arm.json](automation/LAB02_soar_lite_automation_rule.arm.json)
 4. Click **Save**
 5. Select the same **Subscription** + **Resource group**
 6. Click **Review + create** → **Create**
@@ -130,7 +130,7 @@ Investigation / reconstruction:
 
 ---
 
-## Detection + automation shipped
+## Detection and automation
 
 ### Scheduled analytic rule
 
@@ -146,7 +146,7 @@ Behavior:
 
 ### Automation rule (SOAR-lite)
 
-- Export: [`automation/AB02_soar_lite_automation_rule.arm.json`](automation/AB02_soar_lite_automation_rule.arm.json)
+- Export: [`automation/LAB02_soar_lite_automation_rule.arm.json`](automation/LAB02_soar_lite_automation_rule.arm.json)
 - Notes: [`automation/README.md`](automation/README.md)
 
 Behavior:
@@ -158,7 +158,7 @@ Behavior:
 
 ---
 
-## Workbook shipped
+## Workbook
 
 - Template: [`workbooks/LAB02_timeline_dashboard.galleryTemplate.json`](workbooks/LAB02_timeline_dashboard.galleryTemplate.json)
 
@@ -184,3 +184,4 @@ Run on **either** `win-ws1` or `win-ws2`:
 $cmd = '"LAB02 encoded test $(Get-Date -Format o)" | Out-File C:\ProgramData\lab02_encoded_test.txt -Append'
 $b64 = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($cmd))
 powershell.exe -NoProfile -EncodedCommand $b64
+```
